@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login Page</title>
+  <script>
+    async function login() {
+      const userId = document.getElementById('userId').value;
+      const password = document.getElementById('password').value;
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, password })
+      });
+      const result = await response.json();
+      if (response.ok) {
+        document.getElementById('loginResult').innerText = 'Login successful';
+        showUserDetails(result.user);
+      } else {
+        document.getElementById('loginResult').innerText = result.message;
+      }
+    }
+
+    async function showUserDetails(user) {
+      document.getElementById('userDetails').innerText = JSON.stringify(user, null, 2);
+      if (user.role === 'Admin') {
+        const response = await fetch('/api/users?role=Admin');
+        const result = await response.json();
+        if (response.ok) {
+          document.getElementById('userList').innerText = JSON.stringify(result.users, null, 2);
+        } else {
+          document.getElementById('userList').innerText = result.message;
+        }
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>Login Page</h1>
+  <form onsubmit="event.preventDefault(); login();">
+    <input type="text" id="userId" placeholder="User ID" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+  </form>
+  <p id="loginResult"></p>
+  <h2>User Details</h2>
+  <pre id="userDetails"></pre>
+  <h2>User List (Admin only)</h2>
+  <pre id="userList"></pre>
+</body>
+</html>
